@@ -10,8 +10,6 @@
     <version>1.0-SNAPSHOT</version>
     <modules>
         <module>shop-net-api</module>
-        <module>service-parent</module>
-        <module>java-parent</module>
         <module>parents</module>
     </modules>
 
