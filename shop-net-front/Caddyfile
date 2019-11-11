@@ -1,0 +1,19 @@
+0.0.0.0:80 {
+  rewrite / {
+    regexp .*
+    to {path} {path}/ /
+  }
+
+  # By default, do no-cache at all
+  # Ideally ETag based validation would be perfect, but Caddy uses file modification date and file size to compute ETag
+  # The problem is that our file size does not change and modification date is always set at 1970-01-01
+  # Therefore Etag does not change and validation is broken.
+  header / Cache-Control "private, max-age=0, no-cache, no-store"
+
+  # Cache static assets, the file name changes when the content changes
+  header /css Cache-Control "max-age=31536000"
+  header /img Cache-Control "max-age=31536000"
+  header /js Cache-Control "max-age=31536000"
+
+  gzip
+}

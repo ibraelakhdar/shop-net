@@ -12,7 +12,56 @@
     <packaging>pom</packaging>
     <artifactId>parents</artifactId>
 
-    <modules>
-        <module>java-service-parent</module>
-    </modules>
+    <properties>
+        <frontend-maven-plugin.version>1.6</frontend-maven-plugin.version>
+        <project.node.version>v10.16.3</project.node.version>
+        <project.npm.version>6.9.0</project.npm.version>
+        <maven.clean.plugin.version>3.1.0</maven.clean.plugin.version>
+    </properties>
+
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>check-if-pom</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>regex-property</goal>
+                        </goals>
+                        <configuration>
+                            <name>isPomProject</name>
+                            <value>${project.packaging}</value>
+                            <regex>^pom$</regex>
+                            <replacement>true</replacement>
+                            <failIfNoMatch>false</failIfNoMatch>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>compute-skip-variables</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>bsh-property</goal>
+                        </goals>
+                        <configuration>
+                            <properties>
+                                <property>skipDocker</property>
+                                <property>skipDockerPush</property>
+                                <property>skipNpm</property>
+                            </properties>
+                            <source>
+                                isPomProject = Boolean.parseBoolean(project.getProperties().getProperty("isPomProject"));
+                                skipDocker = isPomProject || Boolean.parseBoolean(session.getUserProperties().getProperty("docker.skip", "false"));
+                                skipDockerPush = isPomProject || Boolean.parseBoolean(session.getUserProperties().getProperty("docker.skip.push", "false"));
+                                skipNpm = isPomProject || Boolean.parseBoolean(session.getUserProperties().getProperty("skip.npm", "false"));
+                            </source>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>
